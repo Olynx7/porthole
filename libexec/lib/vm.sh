@@ -190,7 +190,9 @@ cmd_status() {
   local state="absent" rdp="closed" disk="-"
   vm_exists && state=$(vm_state)
 
-  if rdp_probe 4; then
+  if [ "$state" = "paused" ]; then
+    rdp="inactive (VM paused)"
+  elif rdp_probe 4; then
     rdp="handshake ok"
   elif tcp_open 127.0.0.1 "$RDP_PORT"; then
     rdp="port open, no answer yet"
