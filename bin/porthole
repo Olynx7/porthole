@@ -1,0 +1,15 @@
+#!/bin/sh
+# porthole - thin launcher. All the real work lives in libexec/porthole.
+set -eu
+
+self=$0
+case $self in
+  */*) ;;
+  *)
+    self=$(command -v -- "$self" 2>/dev/null || true)
+    [ -n "$self" ] || { echo "porthole: cannot locate own path" >&2; exit 2; }
+    ;;
+esac
+
+dir=$(CDPATH= cd -- "$(dirname -- "$self")" && pwd -P)
+exec "$dir/../libexec/porthole" "$@"

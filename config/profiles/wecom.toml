@@ -1,0 +1,57 @@
+# 企业微信 (WeCom) on tiny10 through Porthole.
+# Every key here can be overridden on the command line.
+
+[profile]
+id   = "wecom"
+name = "企业微信"
+icon = "wecom"
+
+[vm]
+# tiny10 = NTDEV's debloated Windows 10 22H2 x64 (3.6 GB ISO, ~10 GB installed)
+version      = "tiny10"
+# Pinned by digest: never let a `docker pull` change the VM builder under us.
+image        = "ghcr.io/dockur/windows@sha256:32cc92715a6c5dc1f63142d3be11059279d64d0faa7519618a07290b3076f9f2"
+cpus         = 2
+ram          = "4G"
+disk         = "32G"
+language     = "Chinese"
+region       = "zh-CN"
+keyboard     = "zh-CN"
+timezone     = "Asia/Shanghai"
+username     = "porthole"
+# QEMU's virtio-vga advertises 1600x900 by default, which caps the RDP
+# session resolution. Advertise the real screen size instead.
+arguments    = "-global virtio-vga.xres=4096 -global virtio-vga.yres=2560"
+rdp_port     = 3391
+console_port = 8006
+
+[session]
+# fullscreen: one Windows desktop filling the screen, app maximised inside it.
+mode          = "window"
+# false keeps Super / Alt+Tab in the hands of GNOME.
+grab_keyboard = false
+floatbar      = true
+dpi_scale     = 125
+monitors      = ""
+window_size   = "1600x900"
+smart_sizing  = false
+extra_args    = []
+
+[app]
+alias        = "WeCom"
+exe          = 'C:\Program Files (x86)\WXWork\WXWork.exe'
+installer    = "WeCom_5.0.12.6018.exe"
+install_args = ["/S"]
+startup      = true
+maximized    = true
+
+[desktop]
+# auto-hide the taskbar, plain wallpaper, no icons, no lock screen.
+tweaks = true
+
+[rdp]
+security = "tls"
+
+[lifecycle]
+pause_on_close      = true
+stop_after_idle_min = 0

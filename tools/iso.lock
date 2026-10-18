@@ -1,0 +1,11 @@
+# Pinned Windows images: size and sha256 for pre-download.
+#
+# The dockur image uses the same URLs internally, so these values are only
+# a convenience for `porthole iso` (skip the download, verify the checksum,
+# or import a file you fetched by hand).
+
+[tiny10]
+name   = "tiny10 x64 23h2.iso"
+url    = "https://archive.org/download/tiny-10-23-h2/tiny10%20x64%2023h2.iso"
+size   = 3839819776
+sha256 = "a11116c0645d892d6a5a7c585ecc1fa13aa66f8c7cc6b03bf1f27bd16860cc35"

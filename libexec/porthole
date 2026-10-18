@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# porthole - run one Windows application as a fullscreen Linux window.
+#
+# The interesting bits live in libexec/lib/*.sh; this file only does
+# path discovery, global option parsing and dispatch.
+set -euo pipefail
+
+PORTHOLE_ROOT=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
+export PORTHOLE_ROOT
+PORTHOLE_VERSION=$(cat "$PORTHOLE_ROOT/VERSION" 2>/dev/null || printf '0+unknown')
+export PORTHOLE_VERSION
+
+# shellcheck source=lib/common.sh
+. "$PORTHOLE_ROOT/libexec/lib/common.sh"
+for _mod in vm iso provision rdp doctor uninstall; do
+  # shellcheck source=/dev/null
+  . "$PORTHOLE_ROOT/libexec/lib/$_mod.sh"
+done
+
+usage() {
+  cat <<'EOF'
+porthole - run one Windows application as a fullscreen Linux window
+
+usage: porthole [options] [command] [args...]
+
+commands:
+  run                 start/resume the VM and open the app fullscreen  (default)
+  shell               open a plain desktop RDP session (for debugging)
+  up                  start the VM without connecting
+  down                shut the VM down gracefully
+  pause               pause the VM (CPU drops to 0%, RAM is kept)
+  resume              resume a paused VM
+  status              show VM / RDP / provisioning state
+  logs [-f]           follow the container log
+  provision [-w]      first-time install: ISO, container, unattended Windows
+  iso [--verify]      pre-download or verify the Windows ISO
+  reset [-y]          destroy the container (keeps the ISO unless --all)
+  doctor [-b]         collect diagnostics (and a tarball with -b)
+  uninstall [-p]      remove porthole from this host (--purge: also VM data)
+  config [show|path]  print the effective configuration
+
+options:
+  -p, --profile NAME  profile to operate on (default: $PORTHOLE_PROFILE or "wecom")
+  -d, --debug         verbose output
+  -V, --version       print version
+  -h, --help          this text
+
+exit codes:
+  0 ok   2 usage/config   3 VM not ready   4 RDP failed   5 provisioning failed
+EOF
+}
+
+main() {
+  local profile_arg="" debug=0
+
+  while [ $# -gt 0 ]; do
+    case $1 in
+      -p|--profile)
+        [ $# -ge 2 ] || { printf 'porthole: --profile needs a value\n' >&2; exit 2; }
+        profile_arg=$2; shift 2 ;;
+      --profile=*) profile_arg=${1#*=}; shift ;;
+      -d|--debug) debug=1; shift ;;
+      -V|--version) printf 'porthole %s\n' "$PORTHOLE_VERSION"; exit 0 ;;
+      -h|--help) usage; exit 0 ;;
+      --) shift; break ;;
+      -*) printf 'porthole: unknown option: %s\n' "$1" >&2; exit 2 ;;
+      *) break ;;
+    esac
+  done
+
+  local cmd=${1:-run}
+  [ $# -gt 0 ] && shift
+
+  export PORTHOLE_DEBUG=$debug
+  [ -n "$profile_arg" ] && export PORTHOLE_PROFILE=$profile_arg
+
+  init_paths
+  cfg_init
+
+  if ! declare -F "cmd_$cmd" >/dev/null; then
+    printf 'porthole: unknown command: %s (try --help)\n' "$cmd" >&2
+    exit 2
+  fi
+
+  "cmd_$cmd" "$@"
+}
+
+main "$@"

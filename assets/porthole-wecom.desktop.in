@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=企业微信
+Name[en]=WeCom
+GenericName=企业微信 (Windows VM)
+Comment=WeCom running in a Windows VM, shown as a fullscreen window
+Exec=@EXEC@
+Icon=@ICON@
+Terminal=false
+StartupWMClass=porthole
+StartupNotify=false
+Categories=Network;InstantMessaging;Chat;
+Keywords=wecom;wechat;work;企业微信;

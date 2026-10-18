@@ -1,0 +1,47 @@
+# Smoke-test profile: no installer, no pinned ISO.
+# `porthole -p notepad provision` lets dockur fetch its own Windows 10 image,
+# which is the fastest way to check the plumbing when WeCom is not in play.
+
+[profile]
+id   = "notepad"
+name = "Notepad (smoke test)"
+icon = "porthole"
+
+[vm]
+version      = "10"
+cpus         = 2
+ram          = "4G"
+disk         = "32G"
+language     = "Chinese"
+region       = "zh-CN"
+keyboard     = "zh-CN"
+timezone     = "Asia/Shanghai"
+username     = "porthole"
+rdp_port     = 3392
+console_port = 8007
+
+[session]
+mode          = "window"
+grab_keyboard = false
+floatbar      = false
+dpi_scale     = 100
+monitors      = ""
+extra_args    = []
+
+[app]
+alias        = "Notepad"
+exe          = 'C:\Windows\System32\notepad.exe'
+installer    = ""
+install_args = []
+startup      = true
+maximized    = true
+
+[desktop]
+tweaks = false
+
+[rdp]
+security = "tls"
+
+[lifecycle]
+pause_on_close = true
+stop_after_idle_min = 0

@@ -1,0 +1,10 @@
+[Unit]
+Description=Shut the porthole VM down after it has been paused for a while
+Documentation=file://%h/.local/lib/porthole/docs/RUNBOOK.md
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/porthole down
+
+[Install]
+WantedBy=default.target

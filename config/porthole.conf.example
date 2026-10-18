@@ -1,0 +1,14 @@
+# porthole host-level defaults (optional).
+# Copy to ~/.config/porthole/porthole.conf and uncomment what you need.
+#
+# Profiles live in ~/.config/porthole/profiles/<name>.toml and override
+# anything the repository default says.
+
+# Default profile when no -p/--profile is given.
+#PORTHOLE_PROFILE=wecom
+
+# Force the ISO download through a proxy (only used when the ISO is missing).
+#PORTHOLE_ISO_PROXY=http://127.0.0.1:7890
+
+# Skip the sha256 re-check of an already downloaded ISO (faster, less safe).
+#PORTHOLE_ISO_SKIP_VERIFY=1

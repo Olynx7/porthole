@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="porthole">
+  <defs>
+    <radialGradient id="glass" cx="45%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#2f6f9e"/>
+      <stop offset="55%" stop-color="#173a56"/>
+      <stop offset="100%" stop-color="#08131f"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c8d6e2"/>
+      <stop offset="45%" stop-color="#7f95a8"/>
+      <stop offset="100%" stop-color="#4d6070"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="128" cy="128" r="124" fill="#132230"/>
+  <circle cx="128" cy="128" r="114" fill="none" stroke="url(#ring)" stroke-width="14"/>
+  <circle cx="128" cy="128" r="100" fill="url(#glass)"/>
+  <circle cx="128" cy="128" r="100" fill="none" stroke="#0a1622" stroke-width="3"/>
+
+  <g fill="#aebfcd">
+    <circle cx="128" cy="17" r="5"/>
+    <circle cx="224" cy="73" r="5"/>
+    <circle cx="224" cy="183" r="5"/>
+    <circle cx="128" cy="239" r="5"/>
+    <circle cx="32" cy="183" r="5"/>
+    <circle cx="32" cy="73" r="5"/>
+  </g>
+
+  <path d="M90 92 H166 A16 16 0 0 1 182 108 V146 A16 16 0 0 1 166 162 H116 L96 184 V162 H90 A16 16 0 0 1 74 146 V108 A16 16 0 0 1 90 92 Z"
+        fill="#2fbf71"/>
+  <g fill="#0f4f30" opacity="0.55">
+    <circle cx="106" cy="127" r="9"/>
+    <circle cx="128" cy="127" r="9"/>
+    <circle cx="150" cy="127" r="9"/>
+  </g>
+</svg>

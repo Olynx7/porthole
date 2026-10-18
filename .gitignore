@@ -1,0 +1,10 @@
+*.log
+*.iso
+__pycache__/
+*.pyc
+.venv/
+/dist/
+/vendor/
+# runtime artefacts that must never be committed
+*.img
+*oem-local/
