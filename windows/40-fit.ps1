@@ -21,6 +21,17 @@ public class Fit {
 
 Add-Type -TypeDefinition $code
 
+# Disable the Windows keys inside the guest. FreeRDP/app-compositor races can
+# leave Windows convinced that Win is still held down, and no client-side fix
+# is reliable; a scancode map removes the key entirely.
+$scanKey = 'HKLM:\SYSTEM\CurrentControlSet\Control\Keyboard Layout'
+$scanValue = (Get-ItemProperty -Path $scanKey -Name 'Scancode Map' -ErrorAction SilentlyContinue).'Scancode Map'
+if (-not $scanValue) {
+    $map = [byte[]](0,0,0,0, 0,0,0,0, 3,0,0,0, 0,0,0x5B,0xE0, 0,0,0x5C,0xE0, 0,0,0,0)
+    Set-ItemProperty -Path $scanKey -Name 'Scancode Map' -Value $map -Type Binary
+    Write-Host 'windows keys disabled (takes effect after a restart)'
+}
+
 $processName = 'WXWork'
 
 # With the kiosk shell there is no explorer to restart a crashed app, so this

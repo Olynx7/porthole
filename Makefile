@@ -41,7 +41,7 @@ install: check
 
 desktop:
 	install -d "$(DATADIR)/applications" "$(DATADIR)/icons/hicolor/256x256/apps"
-	sed -e 's|@EXEC@|$(BINDIR)/porthole run wecom|' \
+	sed -e 's|@EXEC@|$(BINDIR)/porthole -p wecom run|' \
 	    -e 's|@ICON@|wecom|' \
 	    assets/porthole-wecom.desktop.in >"$(DATADIR)/applications/porthole-wecom.desktop"
 	cp -f assets/icons/wecom.png "$(DATADIR)/icons/hicolor/256x256/apps/wecom.png"
