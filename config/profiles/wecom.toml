@@ -34,7 +34,7 @@ grab_keyboard = false
 floatbar      = true
 dpi_scale     = 200
 monitors      = ""
-window_size   = "1600x1000"
+window_size   = "3200x2000"
 # "explorer" keeps the taskbar (auto-hide only); "app" replaces the shell
 # entirely, which is the only reliable way to get rid of it.
 shell         = "explorer"
