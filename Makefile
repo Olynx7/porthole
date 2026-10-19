@@ -47,6 +47,8 @@ desktop:
 	cp -f assets/icons/wecom.png "$(DATADIR)/icons/hicolor/256x256/apps/wecom.png"
 	-update-desktop-database "$(DATADIR)/applications" >/dev/null 2>&1 || true
 	-gtk-update-icon-cache -f -t "$(DATADIR)/icons/hicolor" >/dev/null 2>&1 || true
+	install -d "$(HOME)/.config/autostart"
+	printf '[Desktop Entry]\nType=Application\nName=porthole tray\nExec=%s/porthole -p wecom tray\nTerminal=false\nNoDisplay=true\nX-GNOME-Autostart-enabled=true\n' "$(BINDIR)" > "$(HOME)/.config/autostart/porthole-tray.desktop"
 	@echo "desktop entry installed"
 
 uninstall:

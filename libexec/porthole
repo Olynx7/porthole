@@ -12,7 +12,7 @@ export PORTHOLE_VERSION
 
 # shellcheck source=lib/common.sh
 . "$PORTHOLE_ROOT/libexec/lib/common.sh"
-for _mod in vm iso provision rdp doctor uninstall; do
+for _mod in vm iso provision rdp doctor uninstall tray; do
   # shellcheck source=/dev/null
   . "$PORTHOLE_ROOT/libexec/lib/$_mod.sh"
 done
@@ -37,6 +37,7 @@ commands:
   reset [-y]          destroy the container (keeps the ISO unless --all)
   doctor [-b]         collect diagnostics (and a tarball with -b)
   uninstall [-p]      remove porthole from this host (--purge: also VM data)
+  tray               run the status icon for the top bar (usually autostarted)
   config [show|path]  print the effective configuration
 
 options:
