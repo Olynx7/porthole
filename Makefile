@@ -43,7 +43,7 @@ desktop:
 	install -d "$(DATADIR)/applications" "$(DATADIR)/icons/hicolor/256x256/apps"
 	sed -e 's|@EXEC@|$(BINDIR)/porthole -p wecom run|' \
 	    -e 's|@ICON@|wecom|' \
-	    assets/porthole-wecom.desktop.in >"$(DATADIR)/applications/porthole-wecom.desktop"
+	    assets/porthole-wecom.desktop.in >"$(DATADIR)/applications/wecom.desktop"
 	cp -f assets/icons/wecom.png "$(DATADIR)/icons/hicolor/256x256/apps/wecom.png"
 	-update-desktop-database "$(DATADIR)/applications" >/dev/null 2>&1 || true
 	-gtk-update-icon-cache -f -t "$(DATADIR)/icons/hicolor" >/dev/null 2>&1 || true
@@ -51,7 +51,7 @@ desktop:
 
 uninstall:
 	rm -rf "$(LIBDIR)"
-	rm -f "$(BINDIR)/porthole" "$(DATADIR)/applications/porthole-wecom.desktop"
+	rm -f "$(BINDIR)/porthole" "$(DATADIR)/applications/wecom.desktop" "$(DATADIR)/applications/porthole-wecom.desktop"
 	rm -f "$(DATADIR)/icons/hicolor/256x256/apps/wecom.png"
 	@echo "removed the porthole code; VM data stays under ~/.local/share/porthole"
 
