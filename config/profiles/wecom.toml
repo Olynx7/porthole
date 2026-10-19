@@ -31,6 +31,9 @@ console_port = 8006
 mode          = "window"
 # false keeps Super / Alt+Tab in the hands of GNOME.
 grab_keyboard = false
+# Remap the Windows key to "no key": GNOME eats the release, and the guest
+# then believes Win is stuck down.
+disable_win_key = true
 floatbar      = true
 dpi_scale     = 200
 monitors      = ""

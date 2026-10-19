@@ -52,7 +52,14 @@ rdp_build_args() {
   printf '/sound\n'
   printf '/clipboard\n'
   printf '/drive:shared,%s\n' "$SHARED"
-  printf '/kbd:lang:0x804\n'
+  if [ "$(cfg session.disable_win_key true)" = "true" ]; then
+    # The Windows key gets swallowed by the compositor on the way back, which
+    # leaves the guest convinced that Win is still held down. Remap it to
+    # "no key" on the client side so it never reaches the session at all.
+    printf '/kbd:lang:0x804,remap:0x5b=0x00,remap:0x5c=0x00\n'
+  else
+    printf '/kbd:lang:0x804\n'
+  fi
   printf '/log-level:WARN\n'
 
   local smart="false"
