@@ -35,6 +35,9 @@ floatbar      = true
 dpi_scale     = 125
 monitors      = ""
 window_size   = "auto"
+# "explorer" keeps the taskbar (auto-hide only); "app" replaces the shell
+# entirely, which is the only reliable way to get rid of it.
+shell         = "explorer"
 smart_sizing  = false
 extra_args    = []
 

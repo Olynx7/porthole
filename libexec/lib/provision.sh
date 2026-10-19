@@ -31,6 +31,7 @@ render_settings() {
   PORTHOLE_CFG_DPI="$DPI_SCALE" \
   PORTHOLE_CFG_TWEAKS="$(cfg desktop.tweaks true)" \
   PORTHOLE_CFG_MONITORS="$MONITORS" \
+  PORTHOLE_CFG_SHELL="$(cfg session.shell explorer)" \
   python3 - "$OEM/settings.json" <<'PY'
 import json
 import os
@@ -56,6 +57,9 @@ settings = {
         "dpi_scale": int(env("PORTHOLE_CFG_DPI", "125") or 125),
     },
     "desktop_tweaks": env("PORTHOLE_CFG_TWEAKS", "true") == "true",
+    "session": {
+        "shell": env("PORTHOLE_CFG_SHELL", "explorer"),
+    },
 }
 
 with open(sys.argv[1], "w", encoding="ascii") as handle:
