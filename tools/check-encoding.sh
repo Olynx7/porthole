@@ -16,7 +16,7 @@ import sys
 
 root = pathlib.Path(sys.argv[1])
 WINDOWS_SUFFIXES = {".bat", ".cmd", ".ps1", ".reg"}
-TEXT_SUFFIXES = {".sh", ".py", ".toml", ".md", ".in", ".conf", ".example", ".lock"}
+TEXT_SUFFIXES = {".sh", ".py", ".toml", ".md", ".in", ".conf", ".example", ".lock", ".yml", ".yaml"}
 TEXT_NAMES = {"makefile", "version", "license"}
 SKIP_DIRS = {".git"}
 
