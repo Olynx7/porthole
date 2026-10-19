@@ -245,17 +245,12 @@ class Tray:
         return {
             0: {"children-display": GLib.Variant("s", "submenu")},
             1: {
-                "label": GLib.Variant("s", "打开企业微信"),
+                "label": GLib.Variant("s", "显示企业微信"),
                 "enabled": GLib.Variant("b", True),
                 "visible": GLib.Variant("b", True),
             },
             2: {
-                "label": GLib.Variant("s", "暂停（释放 CPU）"),
-                "enabled": GLib.Variant("b", True),
-                "visible": GLib.Variant("b", True),
-            },
-            3: {
-                "label": GLib.Variant("s", "退出托盘图标"),
+                "label": GLib.Variant("s", "退出（停止容器）"),
                 "enabled": GLib.Variant("b", True),
                 "visible": GLib.Variant("b", True),
             },
@@ -265,7 +260,7 @@ class Tray:
         items = self.menu_items()
         children = []
         if parent == 0:
-            for child_id in (1, 2, 3):
+            for child_id in (1, 2):
                 children.append(GLib.Variant("(ia{sv}av)", (child_id, items[child_id], [])))
         return (parent, items.get(parent, {}), children)
 
@@ -346,8 +341,15 @@ class Tray:
         if item_id == 1:
             spawn(["-p", "wecom", "run"])
         elif item_id == 2:
-            spawn(["-p", "wecom", "pause"])
-        elif item_id == 3:
+            # Full exit: shut the container down, then drop the icon.
+            subprocess.run(
+                [porthole_path(), "-p", "wecom", "down"],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=180,
+                start_new_session=True,
+            )
             self.loop.quit()
 
     # --- setup ----------------------------------------------------------

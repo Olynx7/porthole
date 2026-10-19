@@ -126,23 +126,62 @@ rdp_build_args() {
   done < <(cfg_list session.extra_args)
 }
 
-rdp_connect() {
+rdp_prepare_args() {
   local mode=$1
-  local grab=$GRAB_KEYBOARD floatbar=$FLOATBAR
-
   [ "$mode" = "fullscreen" ] && [ "$SESSION_MODE" = "window" ] && mode="window"
 
-  local args_file
-  args_file=$(mktemp "${TMPDIR:-/tmp}/porthole-args.XXXXXX")
-  chmod 600 "$args_file"
-  rdp_build_args "$mode" "$DPI_SCALE" "$grab" "$floatbar" >"$args_file"
-  debug "xfreerdp args: $(tr '\n' ' ' <"$args_file" | sed 's#/p:[^ ]*#/p:***#')"
+  RDP_ARGS_FILE=$(mktemp "${TMPDIR:-/tmp}/porthole-args.XXXXXX")
+  chmod 600 "$RDP_ARGS_FILE"
+  rdp_build_args "$mode" "$DPI_SCALE" "$GRAB_KEYBOARD" "$FLOATBAR" >"$RDP_ARGS_FILE"
+  debug "xfreerdp args: $(tr '\n' ' ' <"$RDP_ARGS_FILE" | sed 's#/p:[^ ]*#/p:***#')"
+}
 
-  local rc=0
-  if ! xfreerdp "/args-from:file:$args_file"; then
-    rc=$?
+rdp_client_window() {
+  local wid
+  xprop -root _NET_CLIENT_LIST 2>/dev/null | sed 's/.*# //; s/,//g' | tr ' ' '\n' |
+  while IFS= read -r wid; do
+    [ -n "$wid" ] || continue
+    if xprop -id "$wid" WM_CLASS 2>/dev/null | grep -q '"porthole"'; then
+      printf '%s\n' "$wid"
+      break
+    fi
+  done
+}
+
+# Pause the VM while the window is minimised, resume when it comes back.
+watch_minimised() {
+  local client_pid=$1 paused=0 wid
+  while kill -0 "$client_pid" 2>/dev/null; do
+    wid=$(rdp_client_window || true)
+    if [ -n "$wid" ]; then
+      if xprop -id "$wid" _NET_WM_STATE 2>/dev/null | grep -q '_NET_WM_STATE_HIDDEN'; then
+        if [ "$paused" -eq 0 ]; then
+          vm_pause >/dev/null 2>&1 && paused=1
+        fi
+      elif [ "$paused" -eq 1 ]; then
+        vm_resume >/dev/null 2>&1 && paused=0
+      fi
+    fi
+    sleep 2
+  done
+}
+
+rdp_connect() {
+  local mode=$1
+  rdp_prepare_args "$mode"
+
+  local rc=0 pid watcher=0
+  if [ "$(cfg lifecycle.pause_on_minimize true)" = "true" ]; then
+    xfreerdp "/args-from:file:$RDP_ARGS_FILE" &
+    pid=$!
+    watch_minimised "$pid" &
+    watcher=$!
+    if ! wait "$pid"; then rc=$?; fi
+    kill "$watcher" 2>/dev/null || true
+  else
+    if ! xfreerdp "/args-from:file:$RDP_ARGS_FILE"; then rc=$?; fi
   fi
-  rm -f "$args_file"
+  rm -f "$RDP_ARGS_FILE"
 
   if [ "$rc" -ne 0 ]; then
     warn "xfreerdp exited with code $rc"
@@ -210,6 +249,8 @@ cmd_run() {
   step "connecting"
   local rc=0
   rdp_connect "$mode" || rc=$?
+
+  ensure_tray
 
   if [ "${PAUSE_ON_CLOSE:-true}" = "true" ]; then
     vm_pause

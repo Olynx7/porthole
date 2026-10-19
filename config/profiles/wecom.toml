@@ -61,4 +61,5 @@ security = "tls"
 
 [lifecycle]
 pause_on_close      = true
+pause_on_minimize   = true
 stop_after_idle_min = 0
