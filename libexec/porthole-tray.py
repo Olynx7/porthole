@@ -391,7 +391,47 @@ class Tray:
         return 0
 
 
+def another_tray_running(connection):
+    try:
+        result = connection.call_sync(
+            "org.freedesktop.DBus",
+            "/org/freedesktop/DBus",
+            "org.freedesktop.DBus",
+            "NameHasOwner",
+            GLib.Variant("(s)", ("org.porthole.Tray",)),
+            None,
+            Gio.DBusCallFlags.NONE,
+            3000,
+            None,
+        )
+        return bool(result.unpack()[0])
+    except GLib.Error:
+        return False
+
+
+def pidfile():
+    return os.path.join(
+        os.environ.get("XDG_RUNTIME_DIR", "/tmp"),
+        f"porthole-{os.getuid()}",
+        "tray.pid",
+    )
+
+
 def main():
+    import atexit
+
+    connection = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+    if another_tray_running(connection):
+        return 0
+    # Hold a well-known name so a second copy can detect us and exit.
+    Gio.bus_own_name_on_connection(
+        connection, "org.porthole.Tray", Gio.BusNameOwnerFlags.NONE, None, None
+    )
+    path = pidfile()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="ascii") as handle:
+        handle.write(str(os.getpid()))
+    atexit.register(lambda: os.path.exists(path) and os.unlink(path))
     return Tray().run()
 
 
