@@ -65,17 +65,19 @@ if ($dpi -ge 100 -and $dpi -le 400) {
 
 # Auto-hide the taskbar: byte 8 of the StuckRects3 blob carries the flags,
 # 0x03 = always auto-hide.
-try {
-    $stuck = Get-ItemProperty -Path "$explorer\StuckRects3" -Name 'Settings' -ErrorAction Stop
-    $blob = $stuck.Settings
-    if ($blob -and $blob.Length -ge 12) {
-        $blob[8] = 3
-        Set-ItemProperty -Path "$explorer\StuckRects3" -Name 'Settings' -Value $blob
-        Write-PortholeLog 'taskbar set to auto-hide'
-    }
-} catch {
-    Write-PortholeLog "could not patch StuckRects3: $($_.Exception.Message)"
+$stuckPath = "$explorer\StuckRects3"
+if (-not (Test-Path $stuckPath)) {
+    New-Item -Path $stuckPath -Force | Out-Null
 }
+$blob = (Get-ItemProperty -Path $stuckPath -Name 'Settings' -ErrorAction SilentlyContinue).Settings
+if (-not $blob -or $blob.Length -lt 12) {
+    # A brand new profile has no StuckRects3 yet; the taskbar picks its
+    # defaults up from this blob, so build one with auto-hide set.
+    $blob = New-Object byte[] 40
+}
+$blob[8] = 3
+Set-ItemProperty -Path $stuckPath -Name 'Settings' -Value $blob -Type Binary
+Write-PortholeLog ("taskbar auto-hide set (blob {0} bytes)" -f $blob.Length)
 
 # Bring the shell back with the new settings loaded.
 Start-Process -FilePath 'explorer.exe'
