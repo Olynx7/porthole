@@ -46,6 +46,7 @@ vm_create() {
     -e "REGION=zh-CN" \
     -e "KEYBOARD=zh-CN" \
     -e "TZ=${TZ:-Asia/Shanghai}" \
+    -e "VGA=$VM_VGA" \
     -e "ARGUMENTS=$VM_ARGUMENTS" \
     -p "127.0.0.1:${RDP_PORT}:3389/tcp" \
     -p "127.0.0.1:${CONSOLE_PORT}:8006" \

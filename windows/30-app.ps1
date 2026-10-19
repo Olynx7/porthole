@@ -111,6 +111,16 @@ if ((Test-Path $exe) -and $app.startup) {
     $shortcut.Description = 'Started by porthole'
     $shortcut.Save()
     Write-PortholeLog "startup shortcut created: $shortcutPath"
+
+    # Keep the app filling the desktop, even when the RDP session changes the
+    # screen resolution after the app has started.
+    $fitPath = Join-Path $startup 'porthole-fit.lnk'
+    $fit = $wsh.CreateShortcut($fitPath)
+    $fit.TargetPath = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
+    $fit.Arguments = '-NoLogo -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\OEM\40-fit.ps1"'
+    $fit.WindowStyle = 7
+    $fit.Save()
+    Write-PortholeLog "fit watcher shortcut created: $fitPath"
 }
 
 $exe = Resolve-AppExe -Preferred $exe

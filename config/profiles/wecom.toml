@@ -19,21 +19,22 @@ region       = "zh-CN"
 keyboard     = "zh-CN"
 timezone     = "Asia/Shanghai"
 username     = "porthole"
-# QEMU's virtio-vga advertises 1600x900 by default, which caps the RDP
-# session resolution. Advertise the real screen size instead.
-arguments    = "-global virtio-vga.xres=4096 -global virtio-vga.yres=2560"
+# virtio-vga exposes exactly one mode (1600x900) to a driverless Windows,
+# which caps the RDP session. A plain VGA adapter goes through the basic
+# display driver and offers a full mode list instead.
+vga          = "std"
 rdp_port     = 3391
 console_port = 8006
 
 [session]
 # fullscreen: one Windows desktop filling the screen, app maximised inside it.
-mode          = "window"
+mode          = "fullscreen"
 # false keeps Super / Alt+Tab in the hands of GNOME.
 grab_keyboard = false
 floatbar      = true
 dpi_scale     = 125
 monitors      = ""
-window_size   = "1600x900"
+window_size   = "auto"
 smart_sizing  = false
 extra_args    = []
 

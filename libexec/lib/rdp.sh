@@ -2,11 +2,26 @@
 # rdp.sh - the actual FreeRDP session.
 
 instance_lock() {
+  # Deliberately not flock(1): the lock file descriptor is inherited by every
+  # child, and `podman start` hands it to conmon, which outlives the client -
+  # the lock then looks busy forever. A directory with a pid file has no such
+  # inheritance problem and can detect a stale owner.
   mkdir -p "$RUN_DIR"
-  exec 9>"$RUN_DIR/$PROFILE.lock"
-  if ! flock -n 9; then
-    die "another porthole session for '$PROFILE' is already running"
+  LOCK_DIR="$RUN_DIR/$PROFILE.session"
+
+  if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+    local owner=""
+    [ -f "$LOCK_DIR/pid" ] && owner=$(cat "$LOCK_DIR/pid" 2>/dev/null || true)
+    if [ -n "$owner" ] && kill -0 "$owner" 2>/dev/null; then
+      die "another porthole session for '$PROFILE' is already running (pid $owner)"
+    fi
+    debug "removing stale session lock${owner:+ (owner $owner is gone)}"
+    rm -rf "$LOCK_DIR"
+    mkdir "$LOCK_DIR" || die "cannot create $LOCK_DIR"
   fi
+
+  printf '%s\n' "$$" >"$LOCK_DIR/pid"
+  trap 'rm -rf "$LOCK_DIR"' EXIT
 }
 
 x_screen_size() {
@@ -68,8 +83,14 @@ rdp_build_args() {
       printf '/floatbar:sticky:off,default:hidden,show:fullscreen\n'
     fi
   else
-    printf '/size:%s\n' "$(cfg session.window_size 1600x900)"
-    printf '/wm-class:porthole-shell\n'
+    local window_size
+    window_size=$(cfg session.window_size auto)
+    if [ "$window_size" = "auto" ]; then
+      window_size=$(x_screen_size 2>/dev/null || printf '1600x900')
+    fi
+    printf '/size:%s\n' "$window_size"
+    printf -- '-decorations\n'
+    printf '/wm-class:porthole\n'
   fi
 
   if [ "$grab" = "true" ]; then
