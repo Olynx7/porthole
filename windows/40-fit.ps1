@@ -22,6 +22,15 @@ public class Fit {
 Add-Type -TypeDefinition $code
 
 $processName = 'WXWork'
+
+# With the kiosk shell there is no explorer to restart a crashed app, so this
+# doubles as a watchdog.
+$settingsPath = 'C:\OEM\settings.json'
+$appExe = $null
+if (Test-Path $settingsPath) {
+    $appExe = (Get-Content -Raw -Path $settingsPath | ConvertFrom-Json).app.exe
+}
+$misses = 0
 $screenWidth = [Fit]::GetSystemMetrics(0)
 $screenHeight = [Fit]::GetSystemMetrics(1)
 Write-Host ("screen: {0}x{1}" -f $screenWidth, $screenHeight)
@@ -43,6 +52,17 @@ while ($true) {
                 [Fit]::ShowWindow($app.MainWindowHandle, 3) | Out-Null
             }
         }
+    }
+
+    if (-not $app) {
+        $misses++
+        if ($appExe -and (Test-Path $appExe) -and $misses -ge 6) {
+            Write-Host "app not running - restarting"
+            Start-Process -FilePath $appExe
+            $misses = 0
+        }
+    } else {
+        $misses = 0
     }
 
     Start-Sleep -Seconds 5
